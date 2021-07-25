@@ -5,11 +5,12 @@ import (
 )
 
 func SetRoutes(r *gin.Engine, routesHandler RoutesHandler) {
-	r.Use(routesHandler.fetchingUserMiddleware())
 	r.NoRoute(routesHandler.endpointNotFound)
 
-	r.GET("", routesHandler.GetAllAppsHandler) //Get all apps
-	r.POST("", routesHandler.CreateAppHandler) //Create an app
+	main := r.Group("", routesHandler.fetchingUserMiddleware())
+
+	main.GET("", routesHandler.GetAllAppsHandler) //Get all apps
+	main.POST("", routesHandler.CreateAppHandler) //Create an app
 
 	appGroup := r.Group(":app_id", routesHandler.fetchingAppMiddleware())
 	appGroup.GET("", routesHandler.GetAppHandler)       // Get an app
@@ -26,7 +27,7 @@ func SetRoutes(r *gin.Engine, routesHandler RoutesHandler) {
 
 	itemsGroup := appGroup.Group("/items")
 	itemsGroup.GET("", routesHandler.SearchGroupingIdsHandler) //Search all grouping ids
-	itemsGroup.POST("", routesHandler.PushLogsHandler)         //Push a log
+	r.POST("/:app_id/items", routesHandler.PushLogsHandler)    //Push a log
 
 	logsGroup := itemsGroup.Group("/:grouping_id", routesHandler.fetchingGroupMiddleware())
 	logsGroup.GET("/", routesHandler.SearchLogsInGroupingHandler)   //Search all logs (corresponding to a grouping ID)

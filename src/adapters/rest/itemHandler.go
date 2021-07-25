@@ -13,7 +13,7 @@ func (rH RoutesHandler) SearchGroupingIdsHandler(c *gin.Context) {
 }
 
 func (rH RoutesHandler) PushLogsHandler(c *gin.Context) {
-
+	//TODO: First find and authenticate token
 }
 
 func (rH RoutesHandler) SearchLogsInGroupingHandler(c *gin.Context) {
