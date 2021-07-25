@@ -1,1 +1,41 @@
-package cmd
+package main
+
+import (
+	"github.com/AliceDiNunno/go-logger/src/adapters/persistence/mongodb"
+	"github.com/AliceDiNunno/go-logger/src/adapters/persistence/postgres"
+	"github.com/AliceDiNunno/go-logger/src/adapters/rest"
+	"github.com/AliceDiNunno/go-logger/src/config"
+	"github.com/AliceDiNunno/go-logger/src/core/usecases"
+	"gorm.io/gorm"
+)
+
+func main() {
+	config.LoadEnv()
+
+	ginConfiguration := config.LoadGinConfiguration()
+	dbConfig := config.LoadGormConfiguration()
+	mongoConfig := config.LoadMongodbConfiguration()
+
+	mongo := mongodb.StartMongodbDatabase(mongoConfig)
+	var logCollection usecases.LogCollection
+
+	logCollection = mongodb.NewLogCollectionRepo(mongo)
+
+	var appRepo usecases.AppRepo
+	var db *gorm.DB
+	if dbConfig.Engine == "POSTGRES" {
+		db = postgres.StartGormDatabase(dbConfig)
+		appRepo = postgres.NewAppRepo(db)
+
+		db.AutoMigrate(&postgres.App{})
+	}
+
+	usecasesHandler := usecases.NewInteractor(appRepo, logCollection)
+
+	restServer := rest.NewServer(ginConfiguration)
+	routesHandler := rest.NewRouter(usecasesHandler)
+
+	rest.SetRoutes(restServer.Router, routesHandler)
+
+	restServer.Start()
+}
