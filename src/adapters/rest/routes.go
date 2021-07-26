@@ -9,25 +9,25 @@ func SetRoutes(r *gin.Engine, routesHandler RoutesHandler) {
 
 	main := r.Group("", routesHandler.fetchingUserMiddleware())
 
-	main.GET("", routesHandler.GetAllAppsHandler) //Get all apps
-	main.POST("", routesHandler.CreateAppHandler) //Create an app
+	main.GET("", routesHandler.GetUserProjectsHandler) //Get all projects
+	main.POST("", routesHandler.CreateProjectHandler)  //Create a project
 
-	appGroup := r.Group(":app_id", routesHandler.fetchingAppMiddleware())
-	appGroup.GET("", routesHandler.GetAppHandler)       // Get an app
-	appGroup.DELETE("", routesHandler.DeleteAppHandler) //Delete an app
+	projectGroup := r.Group(":project_id", routesHandler.fetchingProjectMiddleware())
+	projectGroup.GET("", routesHandler.GetProjectHandler)       // Get a project
+	projectGroup.DELETE("", routesHandler.DeleteProjectHandler) //Delete a project
 
-	environmentGroup := appGroup.Group("/environment")
-	environmentGroup.GET("", routesHandler.GetEnvironmentHandler) //Getting all declared environments for an app
+	environmentGroup := projectGroup.Group("/environment")
+	environmentGroup.GET("", routesHandler.GetEnvironmentHandler) //Getting all declared environments for a project
 
-	versionGroup := appGroup.Group("/version")
-	versionGroup.GET("", routesHandler.GetVersionHandler) //Getting all declared version for an app
+	versionGroup := projectGroup.Group("/version")
+	versionGroup.GET("", routesHandler.GetVersionHandler) //Getting all declared version for a project
 
-	serverGroup := appGroup.Group("/server")
-	serverGroup.GET("", routesHandler.GetServerHandler) //Getting all declared servers for an app
+	serverGroup := projectGroup.Group("/server")
+	serverGroup.GET("", routesHandler.GetServerHandler) //Getting all declared servers for a project
 
-	itemsGroup := appGroup.Group("/items")
-	itemsGroup.GET("", routesHandler.SearchGroupingIdsHandler) //Search all grouping ids
-	r.POST("/:app_id/items", routesHandler.PushLogsHandler)    //Push a log
+	itemsGroup := projectGroup.Group("/items")
+	itemsGroup.GET("", routesHandler.SearchGroupingIdsHandler)  //Search all grouping ids
+	r.POST("/:project_id/items", routesHandler.PushLogsHandler) //Push a log
 
 	logsGroup := itemsGroup.Group("/:grouping_id", routesHandler.fetchingGroupMiddleware())
 	logsGroup.GET("/", routesHandler.SearchLogsInGroupingHandler)   //Search all logs (corresponding to a grouping ID)

@@ -1,6 +1,9 @@
 package usecases
 
-import "github.com/AliceDiNunno/go-logger/src/core/domain"
+import (
+	"github.com/AliceDiNunno/go-logger/src/core/domain"
+	"github.com/google/uuid"
+)
 
 type Logger interface {
 	Error(args ...interface{})
@@ -9,7 +12,12 @@ type Logger interface {
 	Debug(args ...interface{})
 }
 
-type AppRepo interface {
+type ProjectRepo interface {
+	CreateProject(project *domain.Project) error
+	FindById(user uuid.UUID, project uuid.UUID) (*domain.Project, error)
+	FindByName(user uuid.UUID, name string) (*domain.Project, error)
+	FindByUser(user uuid.UUID) ([]*domain.Project, error)
+	DeleteProject(project *domain.Project) error
 }
 
 type LogCollection interface {
@@ -17,13 +25,25 @@ type LogCollection interface {
 }
 
 type interactor struct {
-	AppRepo       AppRepo
+	ProjectRepo   ProjectRepo
 	LogCollection LogCollection
 }
 
-func NewInteractor(aR AppRepo, lC LogCollection) interactor {
+func (i interactor) DeleteProject(user *domain.User, project *domain.Project) error {
+	panic("implement me")
+}
+
+func (i interactor) GetAlbumsContent(user *domain.User, project *domain.Project) {
+	panic("implement me")
+}
+
+func (i interactor) GetUserProjects(user *domain.User) ([]*domain.Project, error) {
+	panic("implement me")
+}
+
+func NewInteractor(pR ProjectRepo, lC LogCollection) interactor {
 	return interactor{
-		AppRepo:       aR,
+		ProjectRepo:   pR,
 		LogCollection: lC,
 	}
 }

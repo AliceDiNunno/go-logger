@@ -21,16 +21,16 @@ func main() {
 
 	logCollection = mongodb.NewLogCollectionRepo(mongo)
 
-	var appRepo usecases.AppRepo
+	var projectRepo usecases.ProjectRepo
 	var db *gorm.DB
 	if dbConfig.Engine == "POSTGRES" {
 		db = postgres.StartGormDatabase(dbConfig)
-		appRepo = postgres.NewAppRepo(db)
+		projectRepo = postgres.NewProjectRepo(db)
 
-		db.AutoMigrate(&postgres.App{})
+		db.AutoMigrate(&postgres.Project{})
 	}
 
-	usecasesHandler := usecases.NewInteractor(appRepo, logCollection)
+	usecasesHandler := usecases.NewInteractor(projectRepo, logCollection)
 
 	restServer := rest.NewServer(ginConfiguration)
 	routesHandler := rest.NewRouter(usecasesHandler)

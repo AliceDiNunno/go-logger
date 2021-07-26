@@ -2,9 +2,15 @@ package domain
 
 import "github.com/google/uuid"
 
-type App struct {
-	ID     uuid.UUID
-	Name   string
-	AppKey uuid.UUID
-	Repo   string
+type Project struct {
+	ID            uuid.UUID
+	Name          string
+	ProjectKey    uuid.UUID
+	RepositoryURL string
+	User          uuid.UUID
+}
+
+func (p *Project) Initialize() {
+	p.ID = uuid.New()
+	p.ProjectKey = uuid.New()
 }
