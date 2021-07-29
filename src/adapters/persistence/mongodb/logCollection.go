@@ -3,7 +3,9 @@ package mongodb
 import (
 	"context"
 	"github.com/AliceDiNunno/go-logger/src/core/domain"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"time"
@@ -119,6 +121,41 @@ func (c logCollection) AddLog(entry *domain.LogEntry) error {
 	_, err := c.collection.InsertOne(context.Background(), entryFromDomain)
 
 	return err
+}
+func (c logCollection) ProjectVersions(project *domain.Project) ([]string, error) {
+	result, err := c.collection.Distinct(context.Background(), "version", bson.M{"project_id": project.ID})
+
+	if err != nil {
+		return nil, err
+	}
+
+	spew.Dump(result)
+
+	return []string{}, nil
+}
+
+func (c logCollection) ProjectEnvironments(project *domain.Project) ([]string, error) {
+	result, err := c.collection.Distinct(context.Background(), "environment", bson.M{"project_id": project.ID})
+
+	if err != nil {
+		return nil, err
+	}
+
+	spew.Dump(result)
+
+	return []string{}, nil
+}
+
+func (c logCollection) ProjectServers(project *domain.Project) ([]string, error) {
+	result, err := c.collection.Distinct(context.Background(), "field", bson.M{"project_id": project.ID})
+
+	if err != nil {
+		return nil, err
+	}
+
+	spew.Dump(result)
+
+	return []string{}, nil
 }
 
 func NewLogCollectionRepo(db *mongo.Client) logCollection {

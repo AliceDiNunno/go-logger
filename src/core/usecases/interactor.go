@@ -23,6 +23,10 @@ type ProjectRepo interface {
 
 type LogCollection interface {
 	AddLog(log *domain.LogEntry) error
+
+	ProjectVersions(project *domain.Project) ([]string, error)
+	ProjectEnvironments(project *domain.Project) ([]string, error)
+	ProjectServers(project *domain.Project) ([]string, error)
 }
 
 type interactor struct {

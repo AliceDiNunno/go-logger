@@ -14,4 +14,8 @@ type Usecases interface {
 	GetUserProjects(user *domain.User) ([]*domain.Project, error)
 
 	PushNewLogEntry(id uuid.UUID, request *request.ItemCreationRequest) error
+
+	FetchProjectVersions(project *domain.Project) ([]string, error)
+	FetchProjectEnvironments(project *domain.Project) ([]string, error)
+	FetchProjectServers(project *domain.Project) ([]string, error)
 }
