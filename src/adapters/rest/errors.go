@@ -11,9 +11,8 @@ import (
 )
 
 var (
-	ErrFormValidation     = errors.New("failed to validate form")
-	ErrUploadFileNotFound = errors.New("upload file not found on client side")
-	ErrNotFound           = errors.New("endpoint not found")
+	ErrFormValidation = errors.New("failed to validate form")
+	ErrNotFound       = errors.New("endpoint not found")
 )
 
 func getFrame(skipFrames int) runtime.Frame {
@@ -43,8 +42,14 @@ func codeForError(err error) int {
 	switch err {
 	case ErrFormValidation:
 		return http.StatusBadRequest
-	case ErrUploadFileNotFound:
-		return http.StatusUnprocessableEntity
+	case domain.ErrFailedToGetUser:
+		return http.StatusUnauthorized
+	case domain.ErrProjectAlreadyExistingWithThisName:
+		return http.StatusConflict
+	case ErrNotFound, domain.ErrProjectNotFound:
+		return http.StatusNotFound
+	case domain.ErrUnableToDeleteObject:
+		return http.StatusInternalServerError
 	}
 	return http.StatusInternalServerError
 }

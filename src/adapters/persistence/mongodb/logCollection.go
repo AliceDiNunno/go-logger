@@ -21,15 +21,18 @@ type logEntry struct {
 	Fingerprint string    `bson:"fingerprint"`
 
 	//Identification (for reproduction)
-	ProjectID      uuid.UUID          `bson:"project"`
-	ServerHostname string             `bson:"server_hostname"`
-	Environment    string             `bson:"environment"`
-	Level          string             `bson:"level"`
-	Version        string             `bson:"version"`
-	Trace          domain.Traceback   `bson:"trace"`
-	NestedTrace    []domain.Traceback `bson:"nested_trace"`
-	UserID         *uuid.UUID         `bson:"user_id"`
-	IPAddress      string             `bson:"ip_address"`
+	Platform    string             `bson:"platform"`
+	Source      string             `bson:"source"`
+	ProjectID   uuid.UUID          `bson:"project"`
+	Hostname    string             `bson:"hostname"`
+	Environment string             `bson:"environment"`
+	Level       string             `bson:"level"`
+	Version     string             `bson:"version"`
+	Trace       domain.Traceback   `bson:"trace"`
+	NestedTrace []domain.Traceback `bson:"nested_trace"`
+	UserID      *uuid.UUID         `bson:"user_id"`
+	IPAddress   string             `bson:"ip_address"`
+	StatusCode  int                `bson:"status_code"`
 
 	//Entry Data
 	Message          string                 `bson:"message"`
@@ -52,8 +55,69 @@ type logCollection struct {
 	collection *mongo.Collection
 }
 
+func logEntryToDomain(entry *logEntry) *domain.LogEntry {
+	return &domain.LogEntry{
+		ID:        entry.ID,
+		CreatedAt: entry.CreatedAt,
+		UpdatedAt: entry.UpdatedAt,
+		ProjectID: entry.ProjectID,
+		Identification: domain.LogIdentification{
+			Client: domain.LogClientIdentification{
+				UserID:    entry.UserID,
+				IPAddress: entry.IPAddress,
+			},
+			Deployment: domain.LogDeploymentIdentification{
+				Platform:    entry.Platform,
+				Source:      entry.Source,
+				Hostname:    entry.Hostname,
+				Environment: entry.Environment,
+				Version:     entry.Version,
+			},
+		},
+		Data: domain.LogData{
+			Timestamp:        entry.Timestamp,
+			GroupingID:       entry.GroupingID,
+			Fingerprint:      entry.Fingerprint,
+			Level:            entry.Level,
+			Trace:            entry.Trace,
+			NestedTrace:      entry.NestedTrace,
+			Message:          entry.Message,
+			StatusCode:       entry.StatusCode,
+			AdditionalFields: entry.AdditionalFields,
+		},
+	}
+}
+
+func logEntryFromDomain(entry *domain.LogEntry) *logEntry {
+	return &logEntry{
+		ID:               entry.ID,
+		CreatedAt:        entry.CreatedAt,
+		UpdatedAt:        entry.UpdatedAt,
+		ProjectID:        entry.ProjectID,
+		Timestamp:        entry.Data.Timestamp,
+		GroupingID:       entry.Data.GroupingID,
+		Fingerprint:      entry.Data.Fingerprint,
+		Level:            entry.Data.Level,
+		Trace:            entry.Data.Trace,
+		AdditionalFields: entry.Data.AdditionalFields,
+		NestedTrace:      entry.Data.NestedTrace,
+		StatusCode:       entry.Data.StatusCode,
+		Message:          entry.Data.Message,
+		Platform:         entry.Identification.Deployment.Platform,
+		Source:           entry.Identification.Deployment.Source,
+		Hostname:         entry.Identification.Deployment.Hostname,
+		Environment:      entry.Identification.Deployment.Environment,
+		Version:          entry.Identification.Deployment.Version,
+		UserID:           entry.Identification.Client.UserID,
+		IPAddress:        entry.Identification.Client.IPAddress,
+	}
+}
+
 func (c logCollection) AddLog(entry *domain.LogEntry) error {
-	_, err := c.collection.InsertOne(context.Background(), entry)
+	entryFromDomain := logEntryFromDomain(entry)
+
+	_, err := c.collection.InsertOne(context.Background(), entryFromDomain)
+
 	return err
 }
 

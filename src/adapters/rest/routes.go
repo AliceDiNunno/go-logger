@@ -12,7 +12,7 @@ func SetRoutes(r *gin.Engine, routesHandler RoutesHandler) {
 	main.GET("", routesHandler.GetUserProjectsHandler) //Get all projects
 	main.POST("", routesHandler.CreateProjectHandler)  //Create a project
 
-	projectGroup := r.Group(":project_id", routesHandler.fetchingProjectMiddleware())
+	projectGroup := main.Group(":project_id", routesHandler.fetchingProjectMiddleware())
 	projectGroup.GET("", routesHandler.GetProjectHandler)       // Get a project
 	projectGroup.DELETE("", routesHandler.DeleteProjectHandler) //Delete a project
 

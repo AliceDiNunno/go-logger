@@ -58,7 +58,19 @@ func (p projectRepo) CreateProject(project *domain.Project) error {
 func (p projectRepo) FindById(user uuid.UUID, projectID uuid.UUID) (*domain.Project, error) {
 	var project *Project
 
-	query := p.db.Where("(\"user\" = ?) AND \"id\" = ?", user, projectID).First(&project)
+	query := p.db.Where("\"user\" = ? AND \"id\" = ?", user, projectID).First(&project)
+
+	if query.Error != nil {
+		return nil, query.Error
+	}
+
+	return projectToDomain(project), nil
+}
+
+func (p projectRepo) FindByIdAndKey(projectID uuid.UUID, projectKey uuid.UUID) (*domain.Project, error) {
+	var project *Project
+
+	query := p.db.Where("\"id\" = ? AND \"project_key\" = ?", projectID, projectKey).First(&project)
 
 	if query.Error != nil {
 		return nil, query.Error
@@ -81,6 +93,7 @@ func projectToDomain(project *Project) *domain.Project {
 		Name:          project.Name,
 		ProjectKey:    project.ProjectKey,
 		RepositoryURL: project.RepositoryURL,
+		User:          project.User,
 	}
 }
 
@@ -90,6 +103,7 @@ func projectFromDomain(project *domain.Project) *Project {
 		Name:          project.Name,
 		ProjectKey:    project.ProjectKey,
 		RepositoryURL: project.RepositoryURL,
+		User:          project.User,
 	}
 }
 

@@ -8,39 +8,42 @@ import (
 
 type LogEntry struct {
 	//Object metadata
-	ID        primitive.ObjectID
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        primitive.ObjectID `json:"id"`
+	CreatedAt time.Time          `json:"created_at"`
+	UpdatedAt time.Time          `json:"updated_at"`
 
 	//Identification (for reproduction)
-	ProjectID      uuid.UUID
-	Identification LogIdentification
-	Data           LogData
+	ProjectID      uuid.UUID         `json:"project_id"`
+	Identification LogIdentification `json:"identification"`
+	Data           LogData           `json:"data"`
 }
 
 type LogData struct {
-	Timestamp        time.Time
-	GroupingID       string
-	Fingerprint      string
-	Level            string
-	Trace            Traceback
-	NestedTrace      []Traceback
-	Message          string
-	AdditionalFields map[string]interface{}
+	Timestamp        time.Time              `json:"timestamp"`
+	GroupingID       string                 `json:"grouping_id"`
+	Fingerprint      string                 `binding:"required,omitempty" json:"fingerprint"`
+	Level            string                 `binding:"required,omitempty" json:"level"`
+	Trace            Traceback              `json:"trace"`
+	NestedTrace      []Traceback            `json:"nested_trace"`
+	Message          string                 `binding:"required,omitempty" json:"message"`
+	StatusCode       int                    `json:"status_code"`
+	AdditionalFields map[string]interface{} `json:"additional_fields"`
 }
 
 type LogClientIdentification struct {
-	UserID    *uuid.UUID
-	IPAddress string
+	UserID    *uuid.UUID `json:"user_id"`
+	IPAddress string     `json:"ip_address"`
 }
 
 type LogDeploymentIdentification struct {
-	ServerHostname string
-	Environment    string
-	Version        string
+	Platform    string `json:"platform"`
+	Source      string `binding:"required,omitempty" json:"source"`   //Source is either server or client
+	Hostname    string `binding:"required,omitempty" json:"hostname"` //Hostname can be the name of the server or the client device
+	Environment string `binding:"required,omitempty" json:"environment"`
+	Version     string `binding:"required,omitempty" json:"version"`
 }
 
 type LogIdentification struct {
-	Client     LogClientIdentification
-	Deployment LogDeploymentIdentification
+	Client     LogClientIdentification     `json:"client"`
+	Deployment LogDeploymentIdentification `json:"deployment"`
 }

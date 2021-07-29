@@ -10,6 +10,7 @@ import (
 
 func (rH RoutesHandler) fetchingProjectMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		println("Check auth")
 		user := rH.getAuthenticatedUser(c)
 		if user == nil {
 			return
@@ -29,12 +30,17 @@ func (rH RoutesHandler) fetchingProjectMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		if project.User != user.UserID {
+			rH.handleError(c, domain.ErrProjectNotFound)
+			return
+		}
+
 		c.Set("project", project)
 	}
 }
 
 func (rH RoutesHandler) getProject(c *gin.Context) *domain.Project {
-	project, exists := c.Get("album")
+	project, exists := c.Get("project")
 
 	if !exists {
 		return nil

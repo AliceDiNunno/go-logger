@@ -11,7 +11,7 @@ func (i interactor) FetchProject(user *domain.User, id uuid.UUID) (*domain.Proje
 		return nil, domain.ErrFailedToGetUser
 	}
 
-	album, err := i.ProjectRepo.FindById(user.UserID, id)
+	album, err := i.projectRepo.FindById(user.UserID, id)
 
 	if err != nil {
 		return nil, err
@@ -24,22 +24,47 @@ func (i interactor) CreateProject(user *domain.User, createRequest *request.Crea
 	project := &domain.Project{
 		Name:          createRequest.Name,
 		RepositoryURL: createRequest.Url,
+		User:          user.UserID,
 	}
 
 	project.Initialize()
 
-	projectSameName, err := i.ProjectRepo.FindByName(user.UserID, createRequest.Name)
+	projectSameName, err := i.projectRepo.FindByName(user.UserID, createRequest.Name)
 
 	if err == nil && projectSameName != nil {
 		//A workflow with the same name already exists for this user
 		return domain.ErrProjectAlreadyExistingWithThisName
 	}
 
-	err = i.ProjectRepo.CreateProject(project)
+	err = i.projectRepo.CreateProject(project)
 
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (i interactor) DeleteProject(user *domain.User, project *domain.Project) error {
+	err := i.projectRepo.DeleteProject(project)
+
+	if err != nil {
+		return domain.ErrUnableToDeleteObject
+	}
+
+	return nil
+}
+
+func (i interactor) GetProjectsContent(user *domain.User, project *domain.Project) {
+	panic("implement me")
+}
+
+func (i interactor) GetUserProjects(user *domain.User) ([]*domain.Project, error) {
+	workflows, err := i.projectRepo.FindByUser(user.UserID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return workflows, nil
 }
