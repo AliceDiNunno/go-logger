@@ -122,20 +122,27 @@ func (c logCollection) AddLog(entry *domain.LogEntry) error {
 
 	return err
 }
+
+func interfaceArrayToStringArray(input []interface{}) []string {
+	output := make([]string, len(input))
+	for i, v := range input {
+		output[i] = v.(string)
+	}
+	return output
+}
+
 func (c logCollection) ProjectVersions(project *domain.Project) ([]string, error) {
-	result, err := c.collection.Distinct(context.Background(), "version", bson.M{"project_id": project.ID})
+	result, err := c.collection.Distinct(context.Background(), "version", bson.M{"project": project.ID})
 
 	if err != nil {
 		return nil, err
 	}
 
-	spew.Dump(result)
-
-	return []string{}, nil
+	return interfaceArrayToStringArray(result), nil
 }
 
 func (c logCollection) ProjectEnvironments(project *domain.Project) ([]string, error) {
-	result, err := c.collection.Distinct(context.Background(), "environment", bson.M{"project_id": project.ID})
+	result, err := c.collection.Distinct(context.Background(), "environment", bson.M{"project": project.ID})
 
 	if err != nil {
 		return nil, err
@@ -143,11 +150,11 @@ func (c logCollection) ProjectEnvironments(project *domain.Project) ([]string, e
 
 	spew.Dump(result)
 
-	return []string{}, nil
+	return interfaceArrayToStringArray(result), nil
 }
 
 func (c logCollection) ProjectServers(project *domain.Project) ([]string, error) {
-	result, err := c.collection.Distinct(context.Background(), "field", bson.M{"project_id": project.ID})
+	result, err := c.collection.Distinct(context.Background(), "hostname", bson.M{"project": project.ID})
 
 	if err != nil {
 		return nil, err
@@ -155,7 +162,7 @@ func (c logCollection) ProjectServers(project *domain.Project) ([]string, error)
 
 	spew.Dump(result)
 
-	return []string{}, nil
+	return interfaceArrayToStringArray(result), nil
 }
 
 func NewLogCollectionRepo(db *mongo.Client) logCollection {
