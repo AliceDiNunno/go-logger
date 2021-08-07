@@ -13,7 +13,6 @@ func SetRoutes(r *gin.Engine, routesHandler RoutesHandler) {
 	main.POST("", routesHandler.CreateProjectHandler)  //Create a project
 
 	projectGroup := main.Group(":project_id", routesHandler.fetchingProjectMiddleware())
-	projectGroup.GET("", routesHandler.GetProjectHandler)       // Get a project
 	projectGroup.DELETE("", routesHandler.DeleteProjectHandler) //Delete a project
 
 	environmentGroup := projectGroup.Group("/environment")
@@ -26,10 +25,11 @@ func SetRoutes(r *gin.Engine, routesHandler RoutesHandler) {
 	serverGroup.GET("", routesHandler.GetServerHandler) //Getting all declared servers for a project
 
 	itemsGroup := projectGroup.Group("/items")
-	itemsGroup.GET("", routesHandler.SearchGroupingIdsHandler)  //Search all grouping ids
+	itemsGroup.GET("", routesHandler.GetProjectHandler)         //Search all grouping ids
 	r.POST("/:project_id/items", routesHandler.PushLogsHandler) //Push a log
 
 	logsGroup := itemsGroup.Group("/:grouping_id", routesHandler.fetchingGroupMiddleware())
-	logsGroup.GET("/", routesHandler.SearchLogsInGroupingHandler)   //Search all logs (corresponding to a grouping ID)
-	logsGroup.GET("/:log_id", routesHandler.GetSpecificLogsHandler) //Getting a specific log id
+	logsGroup.GET("/occurrences", routesHandler.GetLogsOccurencesHandler)       //Getting a specific log id
+	logsGroup.GET("/", routesHandler.SearchLogsInGroupingHandler)               //Search all logs (corresponding to a grouping ID)
+	logsGroup.GET("/occurrences/:log_id", routesHandler.GetSpecificLogsHandler) //Getting a specific log id
 }

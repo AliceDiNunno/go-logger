@@ -2,12 +2,14 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 	"github.com/AliceDiNunno/go-logger/src/core/domain"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
@@ -163,6 +165,81 @@ func (c logCollection) ProjectServers(project *domain.Project) ([]string, error)
 	spew.Dump(result)
 
 	return interfaceArrayToStringArray(result), nil
+}
+
+func (c logCollection) ProjectGroupingIds(project *domain.Project) ([]string, error) {
+	result, err := c.collection.Distinct(context.Background(), "grouping_id", bson.M{"project": project.ID})
+
+	if err != nil {
+		return nil, err
+	}
+
+	spew.Dump(result)
+
+	return interfaceArrayToStringArray(result), nil
+}
+
+func (c logCollection) FindLastEntryForGroup(project *domain.Project, groupingId string) (*domain.LogEntry, error) {
+	var entry logEntry
+
+	queryOptions := options.FindOneOptions{}
+
+	queryOptions.SetSort(bson.D{{"created_at", -1}})
+
+	err := c.collection.FindOne(context.Background(), bson.D{{"grouping_id", groupingId}}, &queryOptions).Decode(&entry)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return logEntryToDomain(&entry), nil
+}
+
+func (c logCollection) FindGroupOccurrences(project *domain.Project, groupingId string) ([]string, error) {
+	var entries []string
+
+	queryOptions := options.FindOptions{}
+
+	queryOptions.SetSort(bson.D{{"created_at", -1}})
+
+	cur, err := c.collection.Find(context.Background(), bson.D{{"grouping_id", groupingId}}, &queryOptions)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(context.Background()) {
+		var elem logEntry
+		err := cur.Decode(&elem)
+		if err == nil {
+			entries = append(entries, fmt.Sprintf("%q", elem.ID.Hex()))
+		}
+	}
+
+	return entries, nil
+}
+func (c logCollection) FindGroupOccurrence(project *domain.Project, groupingId string, occurenceId string) (*domain.LogEntry, error) {
+	var entry logEntry
+
+	queryOptions := options.FindOneOptions{}
+
+	queryOptions.SetSort(bson.D{{"created_at", -1}})
+
+	id, err := primitive.ObjectIDFromHex(occurenceId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	search := bson.D{{"grouping_id", groupingId}, {"_id", id}}
+	spew.Dump(search)
+	err = c.collection.FindOne(context.Background(), search, &queryOptions).Decode(&entry)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return logEntryToDomain(&entry), nil
 }
 
 func NewLogCollectionRepo(db *mongo.Client) logCollection {

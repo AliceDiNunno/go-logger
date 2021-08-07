@@ -27,6 +27,11 @@ type LogCollection interface {
 	ProjectVersions(project *domain.Project) ([]string, error)
 	ProjectEnvironments(project *domain.Project) ([]string, error)
 	ProjectServers(project *domain.Project) ([]string, error)
+	ProjectGroupingIds(project *domain.Project) ([]string, error)
+
+	FindLastEntryForGroup(project *domain.Project, groupingId string) (*domain.LogEntry, error)
+	FindGroupOccurrences(project *domain.Project, groupingId string) ([]string, error)
+	FindGroupOccurrence(project *domain.Project, groupingId string, occurenceId string) (*domain.LogEntry, error)
 }
 
 type interactor struct {

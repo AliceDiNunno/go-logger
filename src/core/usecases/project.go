@@ -55,8 +55,12 @@ func (i interactor) DeleteProject(user *domain.User, project *domain.Project) er
 	return nil
 }
 
-func (i interactor) GetProjectsContent(user *domain.User, project *domain.Project) {
-	panic("implement me")
+func (i interactor) GetProjectsContent(user *domain.User, project *domain.Project) ([]string, error) {
+	if user == nil {
+		return nil, domain.ErrFailedToGetUser
+	}
+
+	return i.logCollection.ProjectGroupingIds(project)
 }
 
 func (i interactor) GetUserProjects(user *domain.User) ([]*domain.Project, error) {

@@ -87,6 +87,24 @@ func (rH RoutesHandler) CreateProjectHandler(c *gin.Context) {
 }
 
 func (rH RoutesHandler) GetProjectHandler(c *gin.Context) {
+	user := rH.getAuthenticatedUser(c)
+	if user == nil {
+		return
+	}
+
+	project := rH.getProject(c)
+	if project == nil {
+		return
+	}
+
+	result, err := rH.usecases.GetProjectsContent(user, project)
+
+	if err != nil {
+		rH.handleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
 }
 
 func (rH RoutesHandler) DeleteProjectHandler(c *gin.Context) {

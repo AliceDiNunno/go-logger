@@ -24,5 +24,21 @@ func (i interactor) PushNewLogEntry(id uuid.UUID, request *request.ItemCreationR
 		Data:           request.Data,
 	}
 
+	if logEntry.Data.GroupingID == "" {
+		logEntry.Data.GroupingID = logEntry.Data.Fingerprint
+	}
+
 	return i.logCollection.AddLog(logEntry)
+}
+
+func (i interactor) FetchGroupingIdContent(project *domain.Project, groupingId string) (*domain.LogEntry, error) {
+	return i.logCollection.FindLastEntryForGroup(project, groupingId)
+}
+
+func (i interactor) FetchGroupingIdOccurrences(project *domain.Project, groupingId string) ([]string, error) {
+	return i.logCollection.FindGroupOccurrences(project, groupingId)
+}
+
+func (i interactor) FetchGroupOccurrence(project *domain.Project, groupingId string, occurrence string) (*domain.LogEntry, error) {
+	return i.logCollection.FindGroupOccurrence(project, groupingId, occurrence)
 }

@@ -13,10 +13,6 @@ func (rH RoutesHandler) fetchingGroupMiddleware() gin.HandlerFunc {
 	}
 }
 
-func (rH RoutesHandler) SearchGroupingIdsHandler(c *gin.Context) {
-
-}
-
 func (rH RoutesHandler) PushLogsHandler(c *gin.Context) {
 	var creationRequest request.ItemCreationRequest
 
@@ -45,9 +41,71 @@ func (rH RoutesHandler) PushLogsHandler(c *gin.Context) {
 }
 
 func (rH RoutesHandler) SearchLogsInGroupingHandler(c *gin.Context) {
+	user := rH.getAuthenticatedUser(c)
+	if user == nil {
+		return
+	}
 
+	project := rH.getProject(c)
+	if project == nil {
+		return
+	}
+
+	groupingId := c.Param("grouping_id")
+
+	logs, err := rH.usecases.FetchGroupingIdContent(project, groupingId)
+
+	if err != nil {
+		rH.handleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, logs)
+}
+
+func (rH RoutesHandler) GetLogsOccurencesHandler(c *gin.Context) {
+	user := rH.getAuthenticatedUser(c)
+	if user == nil {
+		return
+	}
+
+	project := rH.getProject(c)
+	if project == nil {
+		return
+	}
+
+	groupingId := c.Param("grouping_id")
+
+	logs, err := rH.usecases.FetchGroupingIdOccurrences(project, groupingId)
+
+	if err != nil {
+		rH.handleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, logs)
 }
 
 func (rH RoutesHandler) GetSpecificLogsHandler(c *gin.Context) {
+	user := rH.getAuthenticatedUser(c)
+	if user == nil {
+		return
+	}
 
+	project := rH.getProject(c)
+	if project == nil {
+		return
+	}
+
+	groupingId := c.Param("grouping_id")
+	logId := c.Param("log_id")
+
+	logs, err := rH.usecases.FetchGroupOccurrence(project, groupingId, logId)
+
+	if err != nil {
+		rH.handleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, logs)
 }
