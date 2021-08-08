@@ -10,7 +10,6 @@ import (
 
 func (rH RoutesHandler) fetchingProjectMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		println("Check auth")
 		user := rH.getAuthenticatedUser(c)
 		if user == nil {
 			return
@@ -69,14 +68,14 @@ func (rH RoutesHandler) GetUserProjectsHandler(c *gin.Context) {
 func (rH RoutesHandler) CreateProjectHandler(c *gin.Context) {
 	user := rH.getAuthenticatedUser(c)
 
-	var request request.CreateProjectRequest
-	err := c.ShouldBind(&request)
+	var creationRequest request.CreateProjectRequest
+	err := c.ShouldBind(&creationRequest)
 	if err != nil {
 		rH.handleError(c, ErrFormValidation)
 		return
 	}
 
-	err = rH.usecases.CreateProject(user, &request)
+	err = rH.usecases.CreateProject(user, &creationRequest)
 
 	if err != nil {
 		rH.handleError(c, err)

@@ -46,7 +46,7 @@ func codeForError(err error) int {
 		return http.StatusUnauthorized
 	case domain.ErrProjectAlreadyExistingWithThisName:
 		return http.StatusConflict
-	case ErrNotFound, domain.ErrProjectNotFound:
+	case ErrNotFound, domain.ErrProjectNotFound, domain.ErrGroupNotFound:
 		return http.StatusNotFound
 	case domain.ErrUnableToDeleteObject:
 		return http.StatusInternalServerError

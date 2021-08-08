@@ -32,13 +32,25 @@ func (i interactor) PushNewLogEntry(id uuid.UUID, request *request.ItemCreationR
 }
 
 func (i interactor) FetchGroupingIdContent(project *domain.Project, groupingId string) (*domain.LogEntry, error) {
+	if !i.logCollection.IsGroupExist(project, groupingId) {
+		return nil, domain.ErrGroupNotFound
+	}
+
 	return i.logCollection.FindLastEntryForGroup(project, groupingId)
 }
 
 func (i interactor) FetchGroupingIdOccurrences(project *domain.Project, groupingId string) ([]string, error) {
+	if !i.logCollection.IsGroupExist(project, groupingId) {
+		return nil, domain.ErrGroupNotFound
+	}
+
 	return i.logCollection.FindGroupOccurrences(project, groupingId)
 }
 
 func (i interactor) FetchGroupOccurrence(project *domain.Project, groupingId string, occurrence string) (*domain.LogEntry, error) {
+	if !i.logCollection.IsGroupExist(project, groupingId) {
+		return nil, domain.ErrGroupNotFound
+	}
+
 	return i.logCollection.FindGroupOccurrence(project, groupingId, occurrence)
 }

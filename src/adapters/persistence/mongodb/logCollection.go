@@ -242,6 +242,17 @@ func (c logCollection) FindGroupOccurrence(project *domain.Project, groupingId s
 	return logEntryToDomain(&entry), nil
 }
 
+func (c logCollection) IsGroupExist(project *domain.Project, groupingId string) bool {
+	search := bson.D{{"grouping_id", groupingId}}
+	count, err := c.collection.CountDocuments(context.Background(), search)
+
+	if err != nil {
+		return false
+	}
+
+	return count > 0
+}
+
 func NewLogCollectionRepo(db *mongo.Client) logCollection {
 	collection := db.Database("logger").Collection("logs")
 

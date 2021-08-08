@@ -28,6 +28,7 @@ type LogCollection interface {
 	ProjectEnvironments(project *domain.Project) ([]string, error)
 	ProjectServers(project *domain.Project) ([]string, error)
 	ProjectGroupingIds(project *domain.Project) ([]string, error)
+	IsGroupExist(project *domain.Project, groupingId string) bool
 
 	FindLastEntryForGroup(project *domain.Project, groupingId string) (*domain.LogEntry, error)
 	FindGroupOccurrences(project *domain.Project, groupingId string) ([]string, error)
