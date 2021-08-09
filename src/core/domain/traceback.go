@@ -1,9 +1,9 @@
 package domain
 
 type TracebackEntry struct {
-	File   string
-	Line   int
-	Method string
+	Filename string
+	Line     int
+	Method   string
 }
 
 type Traceback struct {

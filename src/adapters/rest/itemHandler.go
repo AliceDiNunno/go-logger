@@ -45,14 +45,14 @@ func (rH RoutesHandler) getGrouping(c *gin.Context) string {
 func (rH RoutesHandler) PushLogsHandler(c *gin.Context) {
 	var creationRequest request.ItemCreationRequest
 
-	err := c.ShouldBind(&creationRequest)
+	id, err := uuid.Parse(c.Param("project_id"))
 
 	if err != nil {
 		rH.handleError(c, ErrFormValidation)
 		return
 	}
 
-	id, err := uuid.Parse(c.Param("project_id"))
+	err = c.ShouldBind(&creationRequest)
 
 	if err != nil {
 		rH.handleError(c, ErrFormValidation)

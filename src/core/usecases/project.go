@@ -59,7 +59,6 @@ func (i interactor) GetProjectsContent(user *domain.User, project *domain.Projec
 	if user == nil {
 		return nil, domain.ErrFailedToGetUser
 	}
-
 	return i.logCollection.ProjectGroupingIds(project)
 }
 
