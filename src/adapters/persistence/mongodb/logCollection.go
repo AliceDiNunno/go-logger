@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/AliceDiNunno/go-logger/src/core/domain"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -150,8 +149,6 @@ func (c logCollection) ProjectEnvironments(project *domain.Project) ([]string, e
 		return nil, err
 	}
 
-	spew.Dump(result)
-
 	return interfaceArrayToStringArray(result), nil
 }
 
@@ -162,8 +159,6 @@ func (c logCollection) ProjectServers(project *domain.Project) ([]string, error)
 		return nil, err
 	}
 
-	spew.Dump(result)
-
 	return interfaceArrayToStringArray(result), nil
 }
 
@@ -173,8 +168,6 @@ func (c logCollection) ProjectGroupingIds(project *domain.Project) ([]string, er
 	if err != nil {
 		return nil, err
 	}
-
-	spew.Dump(result)
 
 	return interfaceArrayToStringArray(result), nil
 }
@@ -232,7 +225,7 @@ func (c logCollection) FindGroupOccurrence(project *domain.Project, groupingId s
 	}
 
 	search := bson.D{{"grouping_id", groupingId}, {"_id", id}}
-	spew.Dump(search)
+
 	err = c.collection.FindOne(context.Background(), search, &queryOptions).Decode(&entry)
 
 	if err != nil {
