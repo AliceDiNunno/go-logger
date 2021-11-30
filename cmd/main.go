@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"github.com/AliceDiNunno/go-logger/src/adapters/persistence/mongodb"
 	"github.com/AliceDiNunno/go-logger/src/adapters/persistence/postgres"
 	"github.com/AliceDiNunno/go-logger/src/adapters/rest"
 	"github.com/AliceDiNunno/go-logger/src/config"
 	"github.com/AliceDiNunno/go-logger/src/core/usecases"
 	"gorm.io/gorm"
+	"log"
 )
 
 func main() {
@@ -27,7 +29,12 @@ func main() {
 		db = postgres.StartGormDatabase(dbConfig)
 		projectRepo = postgres.NewProjectRepo(db)
 
-		db.AutoMigrate(&postgres.Project{})
+		err := db.AutoMigrate(&postgres.Project{})
+		if err != nil {
+			log.Fatalln(err)
+		}
+	} else {
+		log.Fatalln(fmt.Sprintf("Database engine \"%s\" not supported", dbConfig.Engine))
 	}
 
 	usecasesHandler := usecases.NewInteractor(projectRepo, logCollection)
