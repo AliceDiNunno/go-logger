@@ -1,13 +1,11 @@
 package rest
 
-import (
-	"github.com/gin-gonic/gin"
-)
+func SetRoutes(server GinServer, routesHandler RoutesHandler) {
+	r := server.Router
 
-func SetRoutes(r *gin.Engine, routesHandler RoutesHandler) {
 	r.NoRoute(routesHandler.endpointNotFound)
 
-	main := r.Group("", routesHandler.fetchingUserMiddleware())
+	main := r.Group(server.Config.Prefix, routesHandler.fetchingUserMiddleware())
 
 	main.GET("", routesHandler.GetUserProjectsHandler) //Get all projects
 	main.POST("", routesHandler.CreateProjectHandler)  //Create a project

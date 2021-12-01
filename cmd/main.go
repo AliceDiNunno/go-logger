@@ -42,7 +42,7 @@ func main() {
 	restServer := rest.NewServer(ginConfiguration)
 	routesHandler := rest.NewRouter(usecasesHandler)
 
-	rest.SetRoutes(restServer.Router, routesHandler)
+	rest.SetRoutes(restServer, routesHandler)
 
 	restServer.Start()
 }
